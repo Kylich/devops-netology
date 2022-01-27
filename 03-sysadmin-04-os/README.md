@@ -12,7 +12,7 @@
         User=nodeusr
         Group=nodeusr
         Type=simple
-        ExecStart=/usr/local/bin/node_exporter
+        ExecStart=/usr/local/bin/node_exporter -c $VARS
         ExecReload=/bin/kill -HUP $MAINPID
         Restart=on-failure
 
