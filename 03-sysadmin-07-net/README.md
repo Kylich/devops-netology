@@ -34,6 +34,9 @@ Set-Cookie: prov=ffbc18c8-e7c2-a06f-8e45-3a71acde47dc; domain=.stackoverflow.com
 
 Connection closed by foreign host.
 ```
+
+Получен код 301 - перенаправление на `https://stackoverflow.com/questions`
+
 ___
 ___
 ___
@@ -67,33 +70,17 @@ vary: Accept-Encoding,Fastly-SSL
 x-dns-prefetch-control: off
 X-Firefox-Spdy: h2
 ```
+Получен ответ 200 - `OK`
 
 ![2-screen](https://raw.githubusercontent.com/Kylich/devops-netology/main/03-sysadmin-07-net/2.png)
+
+Загрузка всей страницы заняла 5,95 сек. Самый долгий запрос - первый, начальная загрузка, 442 мс
+
 ___
 ___
 ___
 3. Какой IP адрес у вас в интернете?
-    - IP 10.0.2.15
-```bash
-vagrant@vagrant:~$ ifconfig
-eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-        inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
-        inet6 fe80::a00:27ff:feb1:285d  prefixlen 64  scopeid 0x20<link>
-        ether 08:00:27:b1:28:5d  txqueuelen 1000  (Ethernet)
-        RX packets 257  bytes 28353 (28.3 KB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 89  bytes 12210 (12.2 KB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-
-lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
-        inet 127.0.0.1  netmask 255.0.0.0
-        inet6 ::1  prefixlen 128  scopeid 0x10<host>
-        loop  txqueuelen 1000  (Local Loopback)
-        RX packets 8  bytes 776 (776.0 B)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 8  bytes 776 (776.0 B)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-```
+    - `vagrant@vagrant:~$  wget -qO- eth0.me - 37.145.191.199`
 
 ___
 ___
@@ -101,6 +88,12 @@ ___
 
 4. Какому провайдеру принадлежит ваш IP адрес? Какой автономной системе AS? Воспользуйтесь утилитой `whois`
 
+```bash
+vagrant@vagrant:~$ whois 37.145.191.199
+inetnum:        37.144.32.0 - 37.147.63.255
+netname:        BEELINE-BROADBAND
+origin:         AS8402
+```
 
 ___
 ___
@@ -132,7 +125,7 @@ traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
 20  * * *
 21  dns.google (8.8.8.8) [AS15169]  14.079 ms * *
 ```
-
+Список AS - AS41733, AS9049, AS15169
 ___
 ___
 ___
@@ -168,19 +161,38 @@ Keys:  Help   Display mode   Restart statistics   Order of fields   quit
 21. dns.google                                               16.7%    18    7.6   9.1   7.1  18.4   3.0
 ````
 
+Худший участок - `5x19x0x106.static-business.spb.ertelecom.ru`
+
 ___
 ___
 ___
 
 7. Какие DNS сервера отвечают за доменное имя dns.google? Какие A записи? воспользуйтесь утилитой `dig`
 
+```bash
+$ dig +short NS dns.google
+ns1.zdns.google.
+ns3.zdns.google.
+ns2.zdns.google.
+ns4.zdns.google.
 
+$ dig +short A dns.google
+8.8.4.4
+8.8.8.8
+```
 ___
 ___
 ___
 
 8. Проверьте PTR записи для IP адресов из задания 7. Какое доменное имя привязано к IP? воспользуйтесь утилитой `dig`
 
+```bash
+$ dig -x 8.8.4.4 | grep ^[0-9].*in-addr
+8.8.4.4.in-addr.arpa.	21274	IN	PTR	dns.google.
+
+$ dig -x 8.8.8.8 | grep ^[0-9].*in-addr
+8.8.8.8.in-addr.arpa.	18561	IN	PTR	dns.google.
+```
 
 ___
 ___
