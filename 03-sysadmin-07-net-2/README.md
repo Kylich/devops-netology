@@ -27,4 +27,3 @@
  Инструкция по установке - https://github.com/svmyasnikov/eve-ng
  Выполните задания на lldp, vlan, bonding в эмуляторе EVE-ng.
 - 1
- ---
