@@ -93,4 +93,4 @@ UNCONN      0            0                  10.0.2.15%eth0:68                   
 - systemd-network - системный демон для управления сетевыми настройками
 ___
 5. Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали.
--
+- ![local-l3](https://raw.githubusercontent.com/Kylich/devops-netology/main/03-sysadmin-08-net/local-l3.jpg)
