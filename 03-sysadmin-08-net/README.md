@@ -56,18 +56,25 @@ ___
 ```bash
 vagrant@vagrant:~$ sudo modprobe -v dummy numdummies=2
 insmod /lib/modules/5.4.0-91-generic/kernel/drivers/net/dummy.ko numdummies=0 numdummies=2
+
 vagrant@vagrant:~$ lsmod | grep dummy
 dummy                  16384  0
-```
-- таблица маршрутизации
-```bash
+
+vagrant@vagrant:~$ ifconfig -a | grep dummy
+dummy0: flags=130<BROADCAST,NOARP>  mtu 1500
+dummy1: flags=130<BROADCAST,NOARP>  mtu 1500
+
+vagrant@vagrant:~$ sudo route add -net 192.168.36.0 netmask 255.255.255.0 eth0
+vagrant@vagrant:~$ sudo route add -net 192.168.30.0 netmask 255.255.255.0 eth0
+
 vagrant@vagrant:~$ route
 Kernel IP routing table
 Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 default         _gateway        0.0.0.0         UG    100    0        0 eth0
 10.0.2.0        0.0.0.0         255.255.255.0   U     0      0        0 eth0
 _gateway        0.0.0.0         255.255.255.255 UH    100    0        0 eth0
-10.0.8.0        0.0.0.0         255.255.255.0   U     0      0        0 dummy0
+192.168.30.0    0.0.0.0         255.255.255.0   U     0      0        0 eth0
+192.168.36.0    0.0.0.0         255.255.255.0   U     0      0        0 eth0
 ```
 ___
 3. Проверьте открытые TCP порты в Ubuntu, какие протоколы и приложения используют эти порты? Приведите несколько примеров.
