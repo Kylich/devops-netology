@@ -32,41 +32,20 @@ SSLStaplingCache "shmcb:logs/stapling-cache(150000)"
 SSLSessionTickets Off
 ```
 ```bash
-$ sudo cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf.bak
-$ sudo nano /etc/apache2/sites-available/default-ssl.conf
+$ sudo vim /etc/apache2/sites-available/default-ssl.conf
 <IfModule mod_ssl.c>
- <VirtualHost _default_:443>
- ServerAdmin your_email@example.com
- ServerName localhost
+    <VirtualHost _default_:443>
 
- DocumentRoot /var/www/html
+        SSLCertificateFile /etc/ssl/certs/sign.crt
+        SSLCertificateKeyFile /etc/ssl/private/sign.key
 
- ErrorLog ${APACHE_LOG_DIR}/error.log
- CustomLog ${APACHE_LOG_DIR}/access.log combined
-
- SSLEngine on
-
- SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt
- SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
-
- <FilesMatch "\.(cgi|shtml|phtml|php)$">
- SSLOptions +StdEnvVars
- </FilesMatch>
- <Directory /usr/lib/cgi-bin>
- SSLOptions +StdEnvVars
- </Directory>
-
- </VirtualHost>
+    </VirtualHost>
 </IfModule>
 ```
 ```shell
-$ sudo nano /etc/apache2/sites-available/000-default.conf
+$ sudo vim /etc/apache2/sites-available/000-default.conf
 <VirtualHost *:80>
- . . .
-
- Redirect "/" "https://localhost/"
-
- . . .
+    Redirect "/" "https://localhost/"
 </VirtualHost>
 ```
 ```shell
@@ -74,84 +53,115 @@ $ sudo a2enmod ssl
 $ sudo a2enmod headers
 $ sudo a2ensite default-ssl
 $ sudo a2enconf ssl-params
-$ sudo apache2ctl configtest
 $ sudo systemctl restart apache2
 ```
-![](pic/ssl.png)
+![ssl](https://raw.githubusercontent.com/Kylich/devops-netology/main/03-sysadmin-09-security/ssl.jpg)
 ___
 4. Проверьте на TLS уязвимости произвольный сайт в интернете.
 -
-```shell
-# docker run --rm -ti drwetter/testssl.sh -U --sneaky https://ya.ru
-...
- Further IP addresses: 2a02:6b8::2:242
- rDNS (87.250.250.242): ya.ru.
- Service detected: HTTP
+```bash
+root@Ubuntu:/etc/apache2/conf-available# nmap --script ssl-enum-ciphers -p 443 netology.ru
 
+Starting Nmap 7.80 ( https://nmap.org ) at 2022-03-04 19:36 MSK
+Nmap scan report for netology.ru (104.22.41.171)
+Host is up (0.0019s latency).
+Other addresses for netology.ru (not scanned): 104.22.40.171 172.67.21.207 2606:4700:10::ac43:15cf 2606:4700:10::6816:29ab 2606:4700:10::6816:28ab
 
- Testing vulnerabilities
-
- Heartbleed (CVE-2014-0160) not vulnerable (OK), no heartbeat extension
- CCS (CVE-2014-0224) not vulnerable (OK)
- Ticketbleed (CVE-2016-9244), experiment. not vulnerable (OK)
- ROBOT not vulnerable (OK)
- Secure Renegotiation (RFC 5746) supported (OK)
- Secure Client-Initiated Renegotiation not vulnerable (OK)
- CRIME, TLS (CVE-2012-4929) not vulnerable (OK)
- BREACH (CVE-2013-3587) no gzip/deflate/compress/br HTTP compression (OK) - only supplied "/" tested
- POODLE, SSL (CVE-2014-3566) not vulnerable (OK)
- TLS_FALLBACK_SCSV (RFC 7507) Downgrade attack prevention supported (OK)
- SWEET32 (CVE-2016-2183, CVE-2016-6329) VULNERABLE, uses 64 bit block ciphers
- FREAK (CVE-2015-0204) not vulnerable (OK)
- DROWN (CVE-2016-0800, CVE-2016-0703) not vulnerable on this host and port (OK)
- make sure you don't use this certificate elsewhere with SSLv2 enabled services
- https://censys.io/ipv4?q=26EB381642B07A05F7CA935101FC6492F91F7F0721995A8E577EDFB6723EBD1F could help you to find out
- LOGJAM (CVE-2015-4000), experimental not vulnerable (OK): no DH EXPORT ciphers, no DH key detected with <= TLS 1.2
- BEAST (CVE-2011-3389) TLS1: ECDHE-RSA-AES128-SHA AES128-SHA
- DES-CBC3-SHA
- VULNERABLE -- but also supports higher protocols TLSv1.1 TLSv1.2 (likely mitigated)
- LUCKY13 (CVE-2013-0169), experimental potentially VULNERABLE, uses cipher block chaining (CBC) ciphers with TLS. Check patches
- Winshock (CVE-2014-6321), experimental not vulnerable (OK)
- RC4 (CVE-2013-2566, CVE-2015-2808) no RC4 ciphers detected (OK)
+PORT    STATE SERVICE
+443/tcp open  https
+| ssl-enum-ciphers:
+|   TLSv1.0:
+|     ciphers:
+|       TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA (ecdh_x25519) - A
+|       TLS_RSA_WITH_AES_128_CBC_SHA (rsa 2048) - A
+|       TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA (ecdh_x25519) - A
+|       TLS_RSA_WITH_AES_256_CBC_SHA (rsa 2048) - A
+|       TLS_RSA_WITH_3DES_EDE_CBC_SHA (rsa 2048) - C
+|     compressors:
+|       NULL
+|     cipher preference: server
+|     warnings:
+|       64-bit block cipher 3DES vulnerable to SWEET32 attack
+|   TLSv1.1:
+|     ciphers:
+|       TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA (ecdh_x25519) - A
+|       TLS_RSA_WITH_AES_128_CBC_SHA (rsa 2048) - A
+|       TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA (ecdh_x25519) - A
+|       TLS_RSA_WITH_AES_256_CBC_SHA (rsa 2048) - A
+|     compressors:
+|       NULL
+|     cipher preference: server
+|   TLSv1.2:
+|     ciphers:
+|       TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA (ecdh_x25519) - A
+|       TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 (ecdh_x25519) - A
+|       TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 (ecdh_x25519) - A
+|       TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA (ecdh_x25519) - A
+|       TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384 (ecdh_x25519) - A
+|       TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 (ecdh_x25519) - A
+|       TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 (ecdh_x25519) - A
+|       TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256-draft (ecdh_x25519) - A
+|       TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA (ecdh_x25519) - A
+|       TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 (ecdh_x25519) - A
+|       TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (ecdh_x25519) - A
+|       TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA (ecdh_x25519) - A
+|       TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 (ecdh_x25519) - A
+|       TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (ecdh_x25519) - A
+|       TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256 (ecdh_x25519) - A
+|       TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256-draft (ecdh_x25519) - A
+|       TLS_RSA_WITH_AES_128_CBC_SHA (rsa 2048) - A
+|       TLS_RSA_WITH_AES_128_CBC_SHA256 (rsa 2048) - A
+|       TLS_RSA_WITH_AES_128_GCM_SHA256 (rsa 2048) - A
+|       TLS_RSA_WITH_AES_256_CBC_SHA (rsa 2048) - A
+|       TLS_RSA_WITH_AES_256_CBC_SHA256 (rsa 2048) - A
+|       TLS_RSA_WITH_AES_256_GCM_SHA384 (rsa 2048) - A
+|     compressors:
+|       NULL
+|     cipher preference: client
+|_  least strength: C
+Nmap done: 1 IP address (1 host up) scanned in 2.55 seconds
 ```
 ___
 5. Установите на Ubuntu ssh сервер, сгенерируйте новый приватный ключ. Скопируйте свой публичный ключ на другой сервер. Подключитесь к серверу по SSH-ключу.
 -
-```shell
-vagrant@netologyVM1:~$ ssh-keygen
+```bash
+nikita@Ubuntu:/etc/ssl$ ssh-keygen
 Generating public/private rsa key pair.
-Enter file in which to save the key (/home/vagrant/.ssh/id_rsa):
-....
-vagrant@netologyVM1:~$ ssh-copy-id -i .ssh/id_rsa vagrant@172.28.128.60
-....
-vagrant@netologyVM1:~$ ssh vagrant@172.28.128.60
+
+nikita@Ubuntu:/etc/ssl$ ssh-copy-id -i .ssh/id_rsa vagrant@172.28.128.60
+
+nikita@Ubuntu:/etc/ssl$ ssh vagrant@172.28.128.60
 Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-80-generic x86_64)
-....
-vagrant@netologyVM2:~$
+
+kylich@Ubuntu:~$
 ```
 ___
 6. Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.
 -
-```shell
-vagrant@netologyVM1:~$ sudo mv ~/.ssh/id_rsa ~/.ssh/id_rsa_netology
-vagrant@netologyVM1:~$ sudo nano ~/.ssh/config
-Host netologyVM2
- HostName 172.28.128.60
- User vagrant
- Port 22
- IdentityFile ~/.ssh/id_rsa_netology
-vagrant@netologyVM1:~$ ssh netologyVM2
+```bash
+nikita@Ubuntu:/etc/ssl$ sudo mv ~/.ssh/id_rsa ~/.ssh/id_rsa_mv
+nikita@Ubuntu:/etc/ssl$ sudo cat ~/.ssh/config
+Host kylich
+    HostName 172.28.128.60
+    User vagrant
+    Port 22
+    IdentityFile ~/.ssh/id_rsa_mv
+
+nikita@Ubuntu:/etc/ssl$ ssh kylich
 Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-80-generic x86_64)
-....
-vagrant@netologyVM2:~$
+
+kylich@Ubuntu:~$
 ```
 ___
 7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.
 -
-```shell
-# tcpdump -nnei any -c 100 -w 100packets.pcap
-tcpdump: listening on any, link-type LINUX_SLL (Linux cooked v1), capture size 262144 bytes
+```bash
+nikita@Ubuntu:/etc/ssl$ sudo tcpdump -nnei any -c 100 -w log.pcap
+
+tcpdump: data link type LINUX_SLL2
+tcpdump: listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144 bytes
 100 packets captured
-178 packets received by filter
+138 packets received by filter
 0 packets dropped by kernel
 ```
+
