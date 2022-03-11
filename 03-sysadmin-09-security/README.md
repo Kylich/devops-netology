@@ -48,7 +48,7 @@ $ sudo vim /etc/apache2/sites-available/000-default.conf
     Redirect "/" "https://localhost/"
 </VirtualHost>
 ```
-```shellsudo vim 
+```shell 
 $ sudo a2enmod ssl
 $ sudo a2enmod headers
 $ sudo a2ensite default-ssl
