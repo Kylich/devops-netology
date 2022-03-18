@@ -35,13 +35,16 @@ done
 
 ### Ваш скрипт:
 ```bash
+#!/bin/bash
+
 while ((1==1))
 do
 	curl https://localhost:4757
-	if (($? != 0))
-	then
-		date >> curl.log
+
+	if (($? != 0)) ; then
 		break
+	else
+		date >> curl.log
 	fi
 done
 ```
@@ -50,7 +53,7 @@ done
 Необходимо написать скрипт, который проверяет доступность трёх IP: `192.168.0.1`, `173.194.222.113`, `87.250.250.242` по `80` порту и записывает результат в файл `log`. Проверять доступность необходимо пять раз для каждого узла.
 
 ### Ваш скрипт:
-```shell
+```bash
 #!/bin/bash
 
 rm log
@@ -58,8 +61,7 @@ array=("192.168.0.1" "173.194.222.113" "87.250.250.242")
 
 for((i=1;i<=5;i++))
 do
-    for a in ${array[@]}
-    do
+    for a in ${array[@]} ; do
         curl $a:80 -I 2>/dev/null | sed -n "1p" | grep -Eo "[0-9]{3,3}.+" | { read -r var; echo "try $i -- curl $a:80  -- code $var"; } >> log
     done
 done
@@ -77,8 +79,7 @@ array=("192.168.0.1" "173.194.222.113" "87.250.250.242")
 br=0
 for((i=1;i<=5;i++))
 do
-	for a in ${array[@]}
-	do
+	for a in ${array[@]} ; do
 		var=`curl $a:80 -I 2>/dev/null | sed -n "1p" | grep -Eo "[0-9]{3,3}.+"`
 		if [ "${var:0:1}" != "2" ] ; then
 			br=1
