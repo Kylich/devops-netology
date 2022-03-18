@@ -41,10 +41,10 @@ while ((1==1))
 do
 	curl https://localhost:4757
 
-	if (($? != 0)) ; then
-		break
-	else
-		date >> curl.log
+	if (($? != 0)) ; then	# если ответ не 0
+		break				# выходим, потому что сервер в сети
+	else					# иначе
+		date >> curl.log	# записываем дату, потому что сервер не в сети
 	fi
 done
 ```
