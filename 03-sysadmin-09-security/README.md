@@ -19,7 +19,9 @@ writing new private key to '/etc/ssl/private/sign.key'
 ```
 ```bash
 
-root@Ubuntu:/etc/apache2/conf-available# vim
+
+root@Ubuntu:/etc/apache2/conf-available# vim ssl-params.conf
+
 
 SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
 SSLProtocol All -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
@@ -48,6 +50,7 @@ $ sudo vim /etc/apache2/sites-available/000-default.conf
     Redirect "/" "https://localhost/"
 </VirtualHost>
 ```
+
 ```shell
 $ sudo a2enmod ssl
 $ sudo a2enmod headers
