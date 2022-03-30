@@ -24,43 +24,82 @@
 
 1. Мы устроились на работу в компанию, где раньше уже был DevOps Engineer. Он написал скрипт, позволяющий узнать, какие файлы модифицированы в репозитории, относительно локальных изменений. Этим скриптом недовольно начальство, потому что в его выводе есть не все изменённые файлы, а также непонятен полный путь к директории, где они находятся. Как можно доработать скрипт ниже, чтобы он исполнял требования вашего руководителя?
 
-	```python
-    #!/usr/bin/env python3
+```python
+#!/usr/bin/env python3
 
-    import os
+import os
 
-	bash_command = ["cd ~/netology/sysadm-homeworks", "git status"]
-	result_os = os.popen(' && '.join(bash_command)).read()
-    is_change = False
-	for result in result_os.split('\n'):
-        if result.find('modified') != -1:
-            prepare_result = result.replace('\tmodified:   ', '')
-            print(prepare_result)
-            break
+bash_command = ["cd ~/netology/sysadm-homeworks", "git status"]
+result_os = os.popen(' && '.join(bash_command)).read()
+is_change = False
+for result in result_os.split('\n'):
+	if result.find('modified') != -1:
+		prepare_result = result.replace('\tmodified:   ', '')
+		print(prepare_result)
+		break
 
-	```
+```
 
 	- исправления
 
-	```python
-    #!/usr/bin/env python3
+```python
+#!/usr/bin/env python3
 
-    import os
+import os
 
-	bash_command = ["cd ~/netology/sysadm-homeworks", "git status"]
-	result_os = os.popen(' && '.join(bash_command)).read()
-    is_change = False
-	for result in result_os.split('\n'):
-        if result.find('modified') != -1:
-            prepare_result = result.replace('\tmodified:   ', '')
-            print(prepare_result)
-            break
-
-	```
+bash_command = ["cd ~/netology/sysadm-homeworks", "git status"]
+result_os = os.popen(' && '.join(bash_command)).read()
+is_change = False
+for result in result_os.split('\n'):
+    if result.find('modified') != -1:
+        prepare_result = folder + '/' + result.replace('\tmodified:   ', '')
+        print(prepare_result)
+```
 
 1. Доработать скрипт выше так, чтобы он мог проверять не только локальный репозиторий в текущей директории, а также умел воспринимать путь к репозиторию, который мы передаём как входной параметр. Мы точно знаем, что начальство коварное и будет проверять работу этого скрипта в директориях, которые не являются локальными репозиториями.
 
+```python
+#!/usr/bin/env python3
+
+import os
+
+folder = input('enter full path to folder: ')
+
+bash_command = [f"cd {folder}", "git status"]
+result_os = os.popen(' && '.join(bash_command)).read()
+is_change = False
+for result in result_os.split('\n'):
+    if result.find('modified') != -1:
+        prepare_result = folder + '/' + result.replace('\tmodified:   ', '')
+        print(prepare_result)
+```
+
 1. Наша команда разрабатывает несколько веб-сервисов, доступных по http. Мы точно знаем, что на их стенде нет никакой балансировки, кластеризации, за DNS прячется конкретный IP сервера, где установлен сервис. Проблема в том, что отдел, занимающийся нашей инфраструктурой очень часто меняет нам сервера, поэтому IP меняются примерно раз в неделю, при этом сервисы сохраняют за собой DNS имена. Это бы совсем никого не беспокоило, если бы несколько раз сервера не уезжали в такой сегмент сети нашей компании, который недоступен для разработчиков. Мы хотим написать скрипт, который опрашивает веб-сервисы, получает их IP, выводит информацию в стандартный вывод в виде: <URL сервиса> - <его IP>. Также, должна быть реализована возможность проверки текущего IP сервиса c его IP из предыдущей проверки. Если проверка будет провалена - оповестить об этом в стандартный вывод сообщением: [ERROR] <URL сервиса> IP mismatch: <старый IP> <Новый IP>. Будем считать, что наша разработка реализовала сервисы: drive.google.com, mail.google.com, google.com.
+
+```python
+#!/usr/bin/env python3
+import os, json, requests
+
+log_file="04-script-02-py/log.json"
+
+with open(log_file, 'r') as log_data:
+    log_json = json.load(log_data)
+
+for site, ip in log_json.items():
+    with requests.get( f'http://{site}/', stream=True ) as r:
+        ip_new = r.raw._original_response.fp.raw._sock.getpeername()[0]
+    if ip != ip_new and ip:
+        print( f'[ERROR] {site} IP mismatch: {ip} {ip_new}' )
+        log_json[site] = ip_new
+    elif not ip:
+        log_json[site] = ip_new
+        print(f'{site} - {ip_new}')
+    else:
+        print(f'{site} - {ip_new}')
+
+with open(log_file, 'w') as log_data:
+    json.dump(log_json, log_data)
+```
 
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
 
