@@ -5,6 +5,8 @@
 Для получения зачета, вам необходимо предоставить:
 - Скриншот страницы, как на слайде из презентации (слайд 37).
 
+![01](https://raw.githubusercontent.com/Kylich/devops-netology/main/05-virt-04-docker-compose/01-ansible.png)
+
 ## Задача 2
 
 Создать вашу первую виртуальную машину в Яндекс.Облаке.
@@ -12,9 +14,10 @@
 Для получения зачета, вам необходимо предоставить:
 - Скриншот страницы свойств созданной ВМ, как на примере ниже:
 
-<p align="center">
-  <img width="1200" height="600" src="./assets/yc_01.png">
-</p>
+
+
+![02](https://raw.githubusercontent.com/Kylich/devops-netology/main/05-virt-04-docker-compose/02-yc.png)
+
 
 ## Задача 3
 
@@ -22,7 +25,6 @@
 
 Для получения зачета, вам необходимо предоставить:
 - Скриншот работающего веб-интерфейса Grafana с текущими метриками, как на примере ниже
-<p align="center">
-  <img width="1200" height="600" src="./assets/yc_02.png">
-</p>
 
+
+![03](https://raw.githubusercontent.com/Kylich/devops-netology/main/05-virt-04-docker-compose/03-grafana.png)
