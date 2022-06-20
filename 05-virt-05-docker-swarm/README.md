@@ -29,7 +29,7 @@
 docker node ls
 ```
 
-![screen](Screen.png)
+![screen](https://raw.githubusercontent.com/Kylich/devops-netology/main/05-virt-05-docker-swarm/Screen.png)
 
 ## Задача 3
 
@@ -39,6 +39,8 @@ docker node ls
 ```
 docker service ls
 ```
+
+![screen](https://raw.githubusercontent.com/Kylich/devops-netology/main/05-virt-05-docker-swarm/Screen.png)
 
 ## Задача 4 (*)
 
