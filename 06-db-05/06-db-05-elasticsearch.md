@@ -22,21 +22,43 @@
 - текст Dockerfile манифеста
 ```docker
 FROM centos:centos7.9.2009
-WORKDIR /usr/src/elasticsearch
-RUN yum -y install wget sudo perl-Digest-SHA && wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-8.3.2-linux-x86_64.tar.gz && wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-8.3.2-linux-x86_64.tar.gz.sha512 && shasum -a 512 -c elasticsearch-oss-8.3.2-linux-x86_64.tar.gz.sha512 && tar -xzf elasticsearch-oss-8.3.2-linux-x86_64.tar.gz
-RUN /bin/sh -c 'mkdir /var/lib/elasticsearch && mkdir /var/lib/elasticsearch/logs && mkdir /var/lib/elasticsearch/data && useradd -s /sbin/nologin elastic'
-RUN /bin/sh -c 'rm -f /usr/src/elasticsearch/elasticsearch-8.3.2/config/elasticsearch.yml'
-COPY ./elasticsearch.yml /usr/src/elasticsearch/elasticsearch-8.3.2/config
-RUN /bin/sh -c 'chown -R elastic /usr/src/elasticsearch/elasticsearch-8.3.2 && chown -R elastic /var/lib/elasticsearch'
-EXPOSE 9200
-EXPOSE 9300
-ENTRYPOINT sudo -u elastic /usr/src/elasticsearch/elasticsearch-8.3.2/bin/elasticsearch
+COPY elasticsearch-8.2.2-linux-x86_64.tar.gz .
+RUN yum install -y java-11-openjdk wget curl perl-Digest-SHA
+RUN export ES_HOME="/var/lib/elasticsearch" && \
+    tar -xzf elasticsearch-8.2.2-linux-x86_64.tar.gz && \
+    rm -f elasticsearch-8.2.2-linux-x86_64.tar.gz && \
+    mv elasticsearch-8.2.2 ${ES_HOME} && \
+    useradd -m -u 1000 elasticsearch && \
+    chown elasticsearch:elasticsearch -R ${ES_HOME}
+COPY --chown=elasticsearch:elasticsearch config/* /var/lib/elasticsearch/config/
+USER 1000
+WORKDIR /var/lib/elasticsearch/
+EXPOSE 9200 9300
+ENTRYPOINT ["bin/elasticsearch"]
 ```
 
 - ссылку на образ в репозитории dockerhub
-    - 111
+    - https://hub.docker.com/repository/docker/kylich/es-netology/general
 - ответ `elasticsearch` на запрос пути `/` в json виде
-    - 111
+    - ```json
+{
+  "name" : "netology_test",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "1jxOaMjeQASfgV6f8TOKSg",
+  "version" : {
+    "number" : "8.2.2",
+    "build_flavor" : "default",
+    "build_type" : "tar",
+    "build_hash" : "bee86328705acaa9a6daede7140defd4d9ec56bd",
+    "build_date" : "2022-07-18T23:04:11.875279988Z",
+    "build_snapshot" : false,
+    "lucene_version" : "8.11.1",
+    "minimum_wire_compatibility_version" : "6.8.0",
+    "minimum_index_compatibility_version" : "6.0.0-beta1"
+  },
+  "tagline" : "You Know, for Search"
+}
+```
 
 ## Задача 2
 
