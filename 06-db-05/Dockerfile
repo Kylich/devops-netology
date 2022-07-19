@@ -1,14 +1,11 @@
 FROM centos:centos7.9.2009
-COPY elasticsearch-8.2.2-linux-x86_64.tar.gz .
-RUN yum install -y java-11-openjdk wget curl perl-Digest-SHA
-RUN export ES_HOME="/var/lib/elasticsearch" && \
-    tar -xzf elasticsearch-8.2.2-linux-x86_64.tar.gz && \
-    rm -f elasticsearch-8.2.2-linux-x86_64.tar.gz && \
-    mv elasticsearch-8.2.2 ${ES_HOME} && \
-    useradd -m -u 1000 elasticsearch && \
-    chown elasticsearch:elasticsearch -R ${ES_HOME}
-COPY --chown=elasticsearch:elasticsearch config/* /var/lib/elasticsearch/config/
-USER 1000
-WORKDIR /var/lib/elasticsearch/
-EXPOSE 9200 9300
-ENTRYPOINT ["bin/elasticsearch"]
+WORKDIR /usr/src/elasticsearch
+COPY ./elasticsearch-8.2.2-linux-x86_64.tar.gz /usr/src/elasticsearch/elasticsearch-8.2.2-linux-x86_64.tar.gz
+RUN yum -y install sudo && tar -xzf elasticsearch-8.2.2-linux-x86_64.tar.gz
+RUN /bin/sh -c 'mkdir /var/lib/elasticsearch && mkdir /var/lib/elasticsearch/data && useradd -s /sbin/nologin elastic'
+RUN /bin/sh -c 'rm -f /usr/src/elasticsearch/elasticsearch-8.2.2/config/elasticsearch.yml'
+COPY ./elasticsearch.yml /usr/src/elasticsearch/elasticsearch-8.2.2/config
+RUN /bin/sh -c 'chown -R elastic /usr/src/elasticsearch/elasticsearch-8.2.2 && chown -R elastic /var/lib/elasticsearch'
+EXPOSE 9200
+EXPOSE 9300
+ENTRYPOINT sudo -u elastic /usr/src/elasticsearch/elasticsearch-8.2.2/bin/elasticsearch
