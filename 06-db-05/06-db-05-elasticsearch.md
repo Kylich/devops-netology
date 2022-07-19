@@ -94,7 +94,7 @@ ENTRYPOINT sudo -u elastic /usr/src/elasticsearch/elasticsearch-8.2.2/bin/elasti
 
 ```json
 {
-  "cluster_name": "docker-cluster",
+  "cluster_name": "elasticsearch",
   "status": "yellow",
   "timed_out": false,
   "number_of_nodes": 1,
