@@ -1,0 +1,7 @@
+node:
+  name: netology_test
+path:
+  data: /var/lib/elasticsearch
+xpack.ml.enabled: false
+xpack.security.enabled: false
+node.store.allow_mmap: false
