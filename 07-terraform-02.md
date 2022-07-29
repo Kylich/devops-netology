@@ -12,7 +12,6 @@
 @ ~ yc config list
 cloud-id: b1g4drro47rs6n3fu4q7
 folder-id: b1gsdofpv4kr8inq06a4
-ajeitns4du6ujmpvs8lo service-akk
 ```
 
 ## Задача 2. Создание yandex_compute_instance через терраформ.
@@ -67,7 +66,6 @@ Note: You didn't use the -out option to save this plan, so Terraform can't guara
 you run "terraform apply" now.
 PS C:\Git\devops-netology\terraform>
 ```
-
 
 
 В качестве результата задания предоставьте:
